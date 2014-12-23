@@ -39,20 +39,36 @@ $(function(){
     });
     $("#createfolderbtn").click(function(){
         var locationId = getCurrentLocationId();
-        createFolder(locationId, $("#createfolder_name").val(), $("#createfolder_comment").val());
+        createFolder(locationId, $("#createfolder_name").val(), $("#createfolder_comment").val(), 1);
+    });
+    $("#createfilebtn").click(function(){
+        var locationId = getCurrentLocationId();
+        createFolder(locationId, $("#createfile_name").val(), $("#createfile_comment").val(), 0);
     });
 });
 
-function createFolder(locationId, name, comment)
+function createFolder(locationId, name, comment, isFolder)
 {
-    $.ajax({ 
-        url: 'scripts/provider.php',
-        data: { action: 'folderCreate', location: locationId, filename: name, comment: comment, host: window.location.hostname},
-        type: 'POST',
-        success: function(output) {
-                     location.reload();
-                }
-    });
+    if (isFolder == 1) {
+        $.ajax({ 
+            url: 'scripts/provider.php',
+            data: { action: 'folderCreate', location: locationId, filename: name, comment: comment, host: window.location.hostname},
+            type: 'POST',
+            success: function(output) {
+                         location.reload();
+                    }
+        });
+    }
+    else {
+        $.ajax({ 
+            url: 'scripts/provider.php',
+            data: { action: 'fileCreate', location: locationId, filename: name, comment: comment, host: window.location.hostname},
+            type: 'POST',
+            success: function(output) {
+                         location.reload();
+                    }
+        });
+    }
 }
 
 function getFolderContent(id)

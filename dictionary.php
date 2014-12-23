@@ -50,41 +50,9 @@
 
     <div class="content">
       <div class="toolbar">
-<!--        
-        <div class="dropdown">
-          <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true">
-            Dropdown
-            <span class="caret"></span>
-          </button>
-          <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
-            <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Copy</a></li>
-            <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Cut</a></li>
-            <li role="presentation" class="disabled"><a role="menuitem" tabindex="-1" href="#">Past</a></li>
-          </ul>
-        </div>       
-        <button type="button" class="btn btn-default">New</button>
-        <button type="button" class="btn btn-default" disabled="disabled">Edit</button>
-        <button type="button" class="btn btn-default" disabled="disabled">Delete</button>      
--->
-<!--
-        <div class="btn-group" role="group" aria-label="...">
-          <button type="button" class="btn btn-default" data-toggle="modal" data-target="#myModal">New</button>
-          <button type="button" class="btn btn-default" disabled="disabled">Edit</button>
-          <button type="button" class="btn btn-default" disabled="disabled">Delete</button>
-
-          <div class="btn-group" role="group">
-            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-              Dropdown
-              <span class="caret"></span>
-            </button>
-            <ul class="dropdown-menu" role="menu">
-              <li><a href="#">Copy</a></li>
-              <li><a href="#">Cut</a></li>
-              <li class="disabled"><a href="#">Paste</a></li>
-            </ul>
-          </div>
-        </div>
--->
+        <button type="button" class="btn btn-default" aria-label="New row" data-placement="top" title="New row" data-toggle="modal" data-target="#dlgEditMeasurementUnit" data-action="new">
+          <span class="glyphicon glyphicon-file" aria-hidden="true"></span>
+        </button>
       </div>
       <div class="message">
 
@@ -97,7 +65,7 @@
 
             echo '<table class="table table-hover table-bordered">';
 
-            measurementunit_render($dictionary_content);
+            measurementunit_render_table($dictionary_content);
 
             echo '</table>';
 
@@ -107,22 +75,9 @@
       </div>      
   </div>
   <!-- Modal -->
-  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-          <h4 class="modal-title" id="myModalLabel">Modal title</h4>
-        </div>
-        <div class="modal-body">
-          ...
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Save changes</button>
-        </div>
-      </div>
-    </div>
-  </div>  
+  <?php
+    measurementunit_render_modal_edit();
+    measurementunit_render_modal_delete(null, null);
+  ?>
   </body>
 </html>

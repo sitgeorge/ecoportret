@@ -51,11 +51,9 @@ if(isset($_POST['action']) && !empty($_POST['action'])) {
         case 'fileCreate' : 
             $parentid = $_POST['location'];
             $filename = $_POST['filename'];
-            $ext = $_POST['ext'];
-            $typeid = filetype_POSTid_by_extname($ext);
-            $filetypeid = $typeid;
+            $filetypeid = 1;
             $isfolder = 0;
-            $isprotected = $_POST['isprotected'];
+            $isprotected = 1;
             $comment = $_POST['comment'];
             $host = $_POST['host'];
             file_insert($parentid, $filename, $filetypeid, $isfolder, $isprotected, $comment, $host);
@@ -70,6 +68,22 @@ if(isset($_POST['action']) && !empty($_POST['action'])) {
             $host = $_POST['host'];
             file_insert($parentid, $filename, $filetypeid, $isfolder, $isprotected, $comment, $host);
             break;
+        case 'measurementUnitInsert':
+            //echo "Insert";
+            $measurementunitname = $_POST['measurementunitname'];
+            measurementunit_insert($measurementunitname);
+            break;
+        case 'measurementUnitDelete':
+            //echo "Delete";
+            $measurementunitid = $_POST['measurementunitid'];
+            measurementunit_delete($measurementunitid);
+            break;            
+        case 'measurementUnitUpdate':
+            //echo "Delete";
+            $measurementunitid = $_POST['measurementunitid'];
+            $measurementunitname = $_POST['measurementunitname'];
+            measurementunit_update( $measurementunitid, $measurementunitname );
+            break;            
     }
 }
 ?>

@@ -355,29 +355,36 @@ function file_get_breadcrumbs
 
 	$recordset = null;
 	$result = null;
-	$recordset = $dbref->query
-		(
-			'select group_concat(distinct breadcrumb.ancestorid order by breadcrumb.level desc) as breadcrumbs,
-			  group_concat(distinct fcrumb.filename order by breadcrumb.level desc separator "/") as breadcrumbsname
-			from file as f1
-				join filetreepath as ftp1 on (ftp1.ancestorid = f1.fileid)
-				join file as f2 on (ftp1.descendantid = f2.fileid)
-					left outer join filetreepath AS ftp2 on (ftp2.descendantid = f2.fileid and ftp2.level = 1)
-					join filetreepath as breadcrumb on (ftp1.descendantid = breadcrumb.descendantid)
-			        inner join file as fcrumb on breadcrumb.ancestorid = fcrumb.fileid
-			where f2.fileid = '.$fileid.'
-			group by ftp1.descendantid
-			order by breadcrumbs'
-		);
-			
-	while ( $data = $recordset->fetch_assoc() )
+
+	if (!is_null($fileid))
 	{
-		$result[] = $data;
+		$recordset = $dbref->query
+			(
+				'select group_concat(distinct breadcrumb.ancestorid order by breadcrumb.level desc) as breadcrumbs,
+				  group_concat(distinct fcrumb.filename order by breadcrumb.level desc separator "/") as breadcrumbsname
+				from file as f1
+					join filetreepath as ftp1 on (ftp1.ancestorid = f1.fileid)
+					join file as f2 on (ftp1.descendantid = f2.fileid)
+						left outer join filetreepath AS ftp2 on (ftp2.descendantid = f2.fileid and ftp2.level = 1)
+						join filetreepath as breadcrumb on (ftp1.descendantid = breadcrumb.descendantid)
+				        inner join file as fcrumb on breadcrumb.ancestorid = fcrumb.fileid
+				where f2.fileid = '.$fileid.'
+				group by ftp1.descendantid
+				order by breadcrumbs'
+			);
+		
+		if (!is_null($recordset))
+		{
+			while ( $data = $recordset->fetch_array() )
+			{
+				$result[] = $data;
+			}
+
+			//$result = $recordset->();
+
+			$recordset->close();
+		}
 	}
-
-	//$result = $recordset->fetch_result();
-
-	$recordset->close();
 
 	closesql();
 	return $result;
@@ -565,6 +572,7 @@ order by f2.isfolder desc, f2.filename asc;
 
 function detail_view
 (
+	$fileid,
 	$ancestorid /* int(10) */
 )
 {
@@ -574,23 +582,25 @@ function detail_view
 
 	$recordset = null;
 	$result = null;
+/*
+	echo "fileid ".$fileid;
+	echo "ancestorid".$ancestorid;
+*/
 	if (is_null($ancestorid))
 	{
 		$recordset = $dbref->query
 		(
 			'
-				select f2.*, ftp2.ancestorid as `_parent`, ftp1.ancestorid,
-				  group_concat(distinct breadcrumb.ancestorid order by breadcrumb.level desc) as breadcrumbs,
-				  group_concat(distinct fcrumb.filename order by breadcrumb.level desc separator '/') as breadcrumbsname
-				from file as f1
-					join filetreepath as ftp1 on (ftp1.ancestorid = f1.fileid)
-					join file as f2 on (ftp1.descendantid = f2.fileid)
-						left outer join filetreepath as ftp2 on (ftp2.descendantid = f2.fileid and ftp2.level = 1)
-						join filetreepath as breadcrumb on (ftp1.descendantid = breadcrumb.descendantid)
-				        inner join file as fcrumb on breadcrumb.ancestorid = fcrumb.fileid
-				where ftp2.ancestorid is null
+				select f2.*, ftp2.ancestorid as `_parent`, ftp1.ancestorid
+				from detail as f1
+					join detailtreepath as ftp1 on (ftp1.ancestorid = f1.detailid)
+					join detail as f2 on (ftp1.descendantid = f2.detailid)
+						left outer join detailtreepath AS ftp2 on (ftp2.descendantid = f2.detailid and ftp2.level = 1)
+						join detailtreepath as breadcrumb on (ftp1.descendantid = breadcrumb.descendantid)
+				        inner join detail as fcrumb on breadcrumb.ancestorid = fcrumb.detailid
+				where ftp2.ancestorid is null and f2.fileid = '.$fileid.'
 				group by ftp1.descendantid
-				order by f2.isfolder desc, f2.filename asc
+				order by f2.sortorder asc, f2.detailname asc
 			'
 		);
 	}
@@ -599,31 +609,32 @@ function detail_view
 		$recordset = $dbref->query
 		(
 			'
-				select f2.*, ftp2.ancestorid as `_parent`, ftp1.ancestorid,
-				  group_concat(distinct breadcrumb.ancestorid order by breadcrumb.level desc) as breadcrumbs,
-				  group_concat(distinct fcrumb.filename order by breadcrumb.level desc separator '/') as breadcrumbsname
-				from file as f1
-					join filetreepath as ftp1 on (ftp1.ancestorid = f1.fileid)
-					join file as f2 on (ftp1.descendantid = f2.fileid)
-						left outer join filetreepath as ftp2 on (ftp2.descendantid = f2.fileid and ftp2.level = 1)
-						join filetreepath as breadcrumb on (ftp1.descendantid = breadcrumb.descendantid)
-				        inner join file as fcrumb on breadcrumb.ancestorid = fcrumb.fileid
-				where ftp1.ancestorid = '.$ancestorid.' and f2.fileid <> '.$ancestorid.'
-				group by ftp1.descendantid
-				order by f2.isfolder desc, f2.filename asc
+				select f2.*, ftp2.ancestorid as `_parent`, ftp1.ancestorid
+				from detail as f1
+					join detailtreepath as ftp1 on (ftp1.ancestorid = f1.detailid)
+					join detail as f2 on (ftp1.descendantid = f2.detailid)
+						left outer join detailtreepath AS ftp2 on (ftp2.descendantid = f2.detailid and ftp2.level = 1)
+						join detailtreepath as breadcrumb on (ftp1.descendantid = breadcrumb.descendantid)
+				        inner join detail as fcrumb on breadcrumb.ancestorid = fcrumb.detailid
+				where dtp1.ancestorid = '.$ancestorid.' and d2.detailid <> '.$ancestorid.' and d2.fileid = '.$fileid.'
+				group by dtp1.descendantid
+				order by d2.sortorder asc, d2.detailname asc				
 			'
 		);
 	}
 
-	while ( $data = $recordset->fetch_assoc() )
+	if (!is_null($recordset))
 	{
-		$result[] = $data;
+		/*echo $recordset->num_rows;*/
+		while ( $data = $recordset->fetch_assoc() )
+		{
+			$result[] = $data;
+		}
+
+		//$result = $recordset->fetch_result();
+
+		$recordset->close();
 	}
-
-	//$result = $recordset->fetch_result();
-
-	$recordset->close();
-
 	closesql();
 	return $result;	
 }
@@ -665,3 +676,147 @@ function filetype_getid_by_extname
 
 	return $result;	
 }	
+
+/****************/
+/* dictionaries */
+/****************/
+
+function measurementunit_view
+(
+	$measurementunitid
+)
+{
+	global $dbref;
+
+	opensql();
+
+	$recordset = null;
+	$result = null;
+/*
+	echo "fileid ".$fileid;
+	echo "ancestorid".$ancestorid;
+*/
+	if (is_null($measurementunitid))
+	{
+		$recordset = $dbref->query
+		(
+			'
+				select * from measurementunit order by measurementunitid
+			'
+		);
+	}
+	else
+	{
+		$recordset = $dbref->query
+		(
+			'
+				select * from measurementunit where measurementunitid = '.$measurementunitid.' order by measurementunitid
+			'
+		);
+	}
+
+	if (!is_null($recordset))
+	{
+		/*echo $recordset->num_rows;*/
+		while ( $data = $recordset->fetch_assoc() )
+		{
+			$result[] = $data;
+		}
+
+		//$result = $recordset->fetch_result();
+
+		$recordset->close();
+	}
+	closesql();
+	return $result;		
+}
+
+
+function measurementunit_insert
+(
+	$measurementunitname /* varchar(50) */
+)
+{
+	global $dbref;
+
+	opensql();
+
+	if (!$dbref->multi_query('insert into measurementunit(measurementunitname) values(\''.$measurementunitname.'\')')) {
+	    echo "There was an error during measurementunit_insert''s call: (" . $dbref->errno . ") " . $dbref->error;
+	}
+
+	$result = 1;
+	closesql();
+	return $result;	
+}
+
+function measurementunit_delete
+(
+	$measurementunitid /* int(10) */
+)
+{
+	global $dbref;
+
+	opensql();
+
+	if (!$dbref->multi_query('delete from measurementunit where measurementunitid='.$measurementunitid)) {
+	    echo "There was an error during measurementunit_delete''s call: (" . $dbref->errno . ") " . $dbref->error;
+	}
+
+	$result = 1;
+	closesql();
+	return $result;	
+}
+
+function measurementunit_update
+(
+	$measurementunitid /* int(10) */,
+	$measurementunitname /* varchar(50) */
+)
+{
+	global $dbref;
+
+	opensql();
+
+	if (!$dbref->multi_query('update measurementunit set measurementunitname=\''.$measurementunitname.'\' where measurementunitid='.$measurementunitid)) {
+	    echo "There was an error during measurementunit_update''s call: (" . $dbref->errno . ") " . $dbref->error;
+	}
+
+	$result = 1;
+	closesql();
+	return $result;	
+}
+
+function measurementunit_allow_delete
+(
+	$measurementunitid /* int(10) */
+)
+{
+	$res = 0;
+
+	global $dbref;
+
+	opensql();
+
+	if (!$dbref->multi_query('select count(*) as cnt from detail where measurementunitid='.$measurementunitid)) {
+	    echo "There was an error during measurementunit_allow_delete''s call: (" . $dbref->errno . ") " . $dbref->error;
+	}
+
+	do {
+	    if ($res = $dbref->store_result()) {
+	        $result = $res->fetch_assoc();
+	        $res->free();
+	    } else {
+	        if ($dbref->errno) {
+	            echo 'Cant gather results from measurementunit_allow_delete: (' . $dbref->errno . ') ' . $dbref->error;
+	        }
+	    }
+	} while ($dbref->more_results() && $dbref->next_result());
+/*
+	if ( $result['cnt'] > 0 ) {
+		$res = 1;
+	}
+*/
+	closesql();
+	return $result;	
+}
