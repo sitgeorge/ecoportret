@@ -692,7 +692,8 @@ function filetype_getid_by_extname
 
 function measurementunit_view
 (
-	$measurementunitid
+	$measurementunitid,
+	$avoidinactive
 )
 {
 	global $dbref;
@@ -705,12 +706,20 @@ function measurementunit_view
 	echo "fileid ".$fileid;
 	echo "ancestorid".$ancestorid;
 */
+
+	$where_clause = "";
+	if ( !is_null( $avoidinactive ) )
+	{
+		$where_clause = " where inactive = 0 ";
+	}
+
+
 	if (is_null($measurementunitid))
 	{
 		$recordset = $dbref->query
 		(
 			'
-				select * from measurementunit order by measurementunitid
+				select * from measurementunit '.$where_clause.' order by measurementunitid
 			'
 		);
 	}

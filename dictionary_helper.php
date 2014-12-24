@@ -24,7 +24,7 @@ function measurementunit_render_page
 
       </div>
       <div class="panel panel-default">
-        <div class="panel-heading">Справочник единиц измерения</div>
+        <div class="panel-heading"><h3>Справочник единиц измерения</h3></div>
         <div class="panel-body">
         ';
     echo '<table class="table table-hover table-bordered">';
@@ -558,7 +558,7 @@ function detailtype_render_modal_edit
 
 	echo '<option value="0"></option>';	
 
-	$mu_content = measurementunit_view(null);		
+	$mu_content = measurementunit_view(null, null);		
 
 	if ( !empty( $mu_content ) ) {
 		foreach ( $mu_content as $mu_item ) {	

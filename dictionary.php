@@ -19,7 +19,7 @@
 
   switch ( $fileid ) {
     case 1:
-      $dictionary_content = measurementunit_view(null);
+      $dictionary_content = measurementunit_view(null, null);
     break;
     case 2:
       $dictionary_content = detailtype_view($search_string, null, null, null);
