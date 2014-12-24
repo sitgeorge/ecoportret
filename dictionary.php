@@ -9,7 +9,22 @@
   else
     die;
 
-  $dictionary_content = measurementunit_view(null);
+  $dictionary_content = null;
+
+  $search_string = null;
+
+  if ( isset( $_GET["searchstring"] ) ) {
+    $search_string = $_GET["searchstring"];
+  } 
+
+  switch ( $fileid ) {
+    case 1:
+      $dictionary_content = measurementunit_view(null);
+    break;
+    case 2:
+      $dictionary_content = detailtype_view($search_string, null, null, null);
+    break;
+  }
 ?>
 
 <html lang="en">
@@ -49,35 +64,36 @@
     <script src="js/base.js"></script>
 
     <div class="content">
-      <div class="toolbar">
-        <button type="button" class="btn btn-default" aria-label="New row" data-placement="top" title="New row" data-toggle="modal" data-target="#dlgEditMeasurementUnit" data-action="new">
-          <span class="glyphicon glyphicon-file" aria-hidden="true"></span>
-        </button>
-      </div>
-      <div class="message">
 
-      </div>
-      <div class="panel panel-default">
-        <div class="panel-heading">Panel heading without title</div>
-        <div class="panel-body">
-          <?php
-            include_once ( 'dictionary_helper.php' );
+      <?php
+        include_once ( 'dictionary_helper.php' );
 
-            echo '<table class="table table-hover table-bordered">';
-
-            measurementunit_render_table($dictionary_content);
-
-            echo '</table>';
-
-          //echo print_r($dictionary_content);
-          ?>
-        </div>
-      </div>      
-  </div>
+        switch ( $fileid ) {
+          case 1:
+            measurementunit_render_page($dictionary_content);
+          break;
+          case 2:
+/*          
+            echo "<pre>";
+            var_dump($dictionary_content); 
+            echo "</pre>";
+*/            
+            detailtype_render_page($fileid, $dictionary_content);
+          break;
+        }
+      ?>
+  
+    </div>
   <!-- Modal -->
   <?php
-    measurementunit_render_modal_edit();
-    measurementunit_render_modal_delete(null, null);
+    switch ( $fileid ) {
+      case 1:
+        measurementunit_render_modal_edit();
+      break;
+      case 2:
+        detailtype_render_modal_edit();
+      break;
+    }
   ?>
   </body>
 </html>

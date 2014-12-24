@@ -1,7 +1,7 @@
 <?php
 
 $sqlservername = '127.0.0.1';
-$sqldbname = 'ecoportret_prod';
+$sqldbname = 'ecoportret';
 $sqldbuser = 'root';
 $sqldbpassword = 'Abcd4680';
 

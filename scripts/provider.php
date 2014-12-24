@@ -68,22 +68,45 @@ if(isset($_POST['action']) && !empty($_POST['action'])) {
             $host = $_POST['host'];
             file_insert($parentid, $filename, $filetypeid, $isfolder, $isprotected, $comment, $host);
             break;
+        /*  D I C T I O N A R I E S */
+
+        /* Measurement Unit */
+
         case 'measurementUnitInsert':
-            //echo "Insert";
             $measurementunitname = $_POST['measurementunitname'];
             measurementunit_insert($measurementunitname);
             break;
         case 'measurementUnitDelete':
-            //echo "Delete";
             $measurementunitid = $_POST['measurementunitid'];
-            measurementunit_delete($measurementunitid);
+            $inactive = $_POST['inactive'];
+            measurementunit_delete($measurementunitid, $inactive);
             break;            
         case 'measurementUnitUpdate':
-            //echo "Delete";
             $measurementunitid = $_POST['measurementunitid'];
             $measurementunitname = $_POST['measurementunitname'];
             measurementunit_update( $measurementunitid, $measurementunitname );
             break;            
+
+        /* Detail Type */
+
+        case 'detailTypeDelete':
+            $detailtypeid = $_POST['detailtypeid'];
+            $inactive = $_POST['inactive'];
+            detailtype_delete($detailtypeid, $inactive);
+            break;
+        case 'detailTypeUpdate':
+            $detailtypeid = $_POST['detailtypeid'];
+            $measurementunitid = $_POST['measurementunitid'];
+            $detailtypename = $_POST['detailtypename'];
+            $comment = $_POST['comment'];
+            detailtype_update( $detailtypeid, $detailtypename, $comment, $measurementunitid );
+            break;
+        case 'detailTypeInsert':
+            $measurementunitid = $_POST['measurementunitid'];
+            $detailtypename = $_POST['detailtypename'];
+            $comment = $_POST['comment'];
+            detailtype_insert( $detailtypename, $comment, $measurementunitid );
+            break;
     }
 }
 ?>

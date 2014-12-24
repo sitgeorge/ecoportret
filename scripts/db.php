@@ -588,6 +588,15 @@ function detail_view
 */
 	if (is_null($ancestorid))
 	{
+/*
+
+	!!!!!!!!!!!!!!!!!!!! Have to use this actual query !!!!!!!!!!!!!!!!!!!!!!!
+
+select d.*, dt.detailtypename, dt.comment as detailtypecomment, mu.measurementunitid, mu.measurementunitname 
+from detail d join detailtype dt on d.detailtypeid = dt.detailtypeid join measurementunit mu on dt.measurementunitid = mu.measurementunitid
+
+*/
+
 		$recordset = $dbref->query
 		(
 			'
@@ -752,14 +761,15 @@ function measurementunit_insert
 
 function measurementunit_delete
 (
-	$measurementunitid /* int(10) */
+	$measurementunitid /* int(10) */,
+	$inactive /* bit */
 )
 {
 	global $dbref;
 
 	opensql();
 
-	if (!$dbref->multi_query('delete from measurementunit where measurementunitid='.$measurementunitid)) {
+	if (!$dbref->multi_query('update measurementunit set inactive = '.$inactive.' where measurementunitid='.$measurementunitid)) {
 	    echo "There was an error during measurementunit_delete''s call: (" . $dbref->errno . ") " . $dbref->error;
 	}
 
@@ -798,7 +808,7 @@ function measurementunit_allow_delete
 
 	opensql();
 
-	if (!$dbref->multi_query('select count(*) as cnt from detail where measurementunitid='.$measurementunitid)) {
+	if (!$dbref->multi_query('select count(*) as cnt from detailtype where measurementunitid='.$measurementunitid)) {
 	    echo "There was an error during measurementunit_allow_delete''s call: (" . $dbref->errno . ") " . $dbref->error;
 	}
 
@@ -812,11 +822,152 @@ function measurementunit_allow_delete
 	        }
 	    }
 	} while ($dbref->more_results() && $dbref->next_result());
-/*
+
 	if ( $result['cnt'] > 0 ) {
 		$res = 1;
 	}
+
+	closesql();
+	return $res;	
+}
+
+function detailtype_view
+(
+	$searchstring,
+	$usepagination,
+	$pageno,
+	$perpagecount
+)
+{
+	global $dbref;
+
+	opensql();
+
+	$recordset = null;
+	$result = null;
+/*
+	echo "fileid ".$fileid;
+	echo "ancestorid".$ancestorid;
 */
+	if (is_null($searchstring))
+	{
+		if (is_null($usepagination))
+		{
+			$recordset = $dbref->query
+			(
+				'
+					select dt.detailtypeid, dt.detailtypename, dt.inactive, dt.comment as detailtypecomment, mu.measurementunitid, mu.measurementunitname 
+					from detailtype dt join measurementunit mu on dt.measurementunitid = mu.measurementunitid			
+					order by detailtypeid
+				'
+			);
+		}
+/*		
+		else
+		{
+			// Pagination
+
+		}
+*/		
+	}
+	else
+	{
+		$recordset = $dbref->query
+		(
+			'
+				select dt.detailtypeid, dt.detailtypename, dt.inactive, dt.comment as detailtypecomment, mu.measurementunitid, mu.measurementunitname 
+				from detailtype dt join measurementunit mu on dt.measurementunitid = mu.measurementunitid
+				where detailtypename like \'%'.$searchstring.'%\'
+				order by detailtypeid
+			'
+		);
+	}
+
+	if (!is_null($recordset))
+	{
+		/*echo $recordset->num_rows;*/
+		while ( $data = $recordset->fetch_assoc() )
+		{
+			$result[] = $data;
+		}
+
+		//$result = $recordset->fetch_result();
+
+		$recordset->close();
+	}
+	closesql();
+	return $result;		
+}
+
+function detailtype_delete
+(
+	$detailtypeid /* int(10) */,
+	$inactive /* bit */
+)
+{
+	global $dbref;
+
+	opensql();
+
+	if (!$dbref->multi_query('update detailtype set inactive = '.$inactive.' where detailtypeid='.$detailtypeid)) {
+	    echo "There was an error during detailtype_delete''s call: (" . $dbref->errno . ") " . $dbref->error;
+	}
+
+	$result = 1;
+	closesql();
+	return $result;	
+}
+
+function detailtype_update
+(
+	$detailtypeid /* int(10) */,
+	$detailtypename /* varchar(50) */,
+	$comment,
+	$measurementunitid
+)
+{
+	global $dbref;
+
+	opensql();
+
+	if (!$dbref->multi_query(
+		'
+			update detailtype 
+				set detailtypename=\''.$detailtypename.'\',
+					comment=\''.$comment.'\',
+					measurementunitid='.$measurementunitid.'
+			where detailtypeid='.$detailtypeid
+
+		)) {
+	    echo "There was an error during detailtypeid_update''s call: (" . $dbref->errno . ") " . $dbref->error;
+	}
+
+	$result = 1;
+	closesql();
+	return $result;	
+}
+
+function detailtype_insert
+(
+	$detailtypename /* varchar(50) */,
+	$comment,
+	$measurementunitid
+)
+{
+	global $dbref;
+
+	opensql();
+
+	if (!$dbref->multi_query(
+			'
+				insert into detailtype(detailtypename, comment, measurementunitid) 
+				values(\''.$detailtypename.'\', \''.$comment.'\', '.$measurementunitid.')
+			'
+		)) {
+	    echo "There was an error during detailtype_insert''s call: (" . $dbref->errno . ") " . $dbref->error;
+	}
+
+	$result = 1;
 	closesql();
 	return $result;	
 }
