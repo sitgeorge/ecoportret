@@ -606,7 +606,7 @@ from detail d join detailtype dt on d.detailtypeid = dt.detailtypeid join measur
 				from detail as f1
 					join detailtreepath as ftp1 on (ftp1.ancestorid = f1.detailid)
 					join detail as f2 on (ftp1.descendantid = f2.detailid)
-						left outer join detailtreepath AS ftp2 on (ftp2.descendantid = f2.detailid)
+						left outer join detailtreepath AS ftp2 on (ftp2.descendantid = f2.detailid and ftp2.level = 1)
 						join detailtreepath as breadcrumb on (ftp1.descendantid = breadcrumb.descendantid)
 				        inner join detail as fcrumb on breadcrumb.ancestorid = fcrumb.detailid
 				where f2.fileid = '.$fileid.'
