@@ -37,7 +37,10 @@
         echo '<table id="example-basic-expandable"><thead><tr><td>detailname</td><td>detailtypeid</td><td>detaildescription</td><td>detailgost</td><td>amount</td><td>measurementunitid</td><td>amountmaterial</td><td>amountmaterialtotal</td><td>comment</td></tr></thead>';
 
         foreach ($result as $item) {
-          echo '<tr data-tt-id="'.$item["detailid"].'"><td>'.$item["detailname"].'</td><td>'.$item["detailtypeid"].'</td><td>'.$item["detaildescription"].'</td><td>'.$item["detailgost"].'</td><td>'.$item["amount"].'</td><td>'.$item["measurementunitid"].'</td><td>'.$item["amountmaterial"].'</td><td>'.$item["amountmaterialtotal"].'</td><td>'.$item["comment"].'</td></tr>';
+          $parent = "";
+          if ($item["detailid"] != $item["_parent"])
+            $parent = "data-tt-parent-id='".$item["_parent"]."'";
+          echo '<tr data-tt-id="'.$item["detailid"].'" '.$parent.'><td>'.$item["detailname"].'</td><td>'.$item["detailtypeid"].'</td><td>'.$item["detaildescription"].'</td><td>'.$item["detailgost"].'</td><td>'.$item["amount"].'</td><td>'.$item["measurementunitid"].'</td><td>'.$item["amountmaterial"].'</td><td>'.$item["amountmaterialtotal"].'</td><td>'.$item["comment"].'</td></tr>';
         }
         echo '</table>';
         //echo print_r($result);

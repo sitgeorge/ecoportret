@@ -1,8 +1,8 @@
 <?php
 
-$sqlservername = '127.0.0.1';
+$sqlservername = 'localhost';
 $sqldbname = 'ecoportret';
 $sqldbuser = 'root';
-$sqldbpassword = 'Abcd4680';
+$sqldbpassword = 'root';
 
 // TODO Add other settings
