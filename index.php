@@ -122,7 +122,7 @@ if (isset($_FILES["userfile"]))
 	<script src="js/jquery-1.11.1.min.js"></script>
   <script src="libs/bootstrap/js/bootstrap.min.js"></script>
  	<script src="js/base.js"></script>
-  <script src="js/popup.js"></script>
+  <!--<script src="js/popup.js"></script>-->
   
   <div class="content">
 
@@ -130,13 +130,13 @@ if (isset($_FILES["userfile"]))
       <div class="btn-group" role="group" aria-label="...">
         <button type="button" class="btn btn-default" data-toggle="modal" data-target="#dlgEditFolder" id="btnAddFolder" data-action="new">Создать папку</button>
         <button type="button" class="btn btn-default" id="btnAddDetail">Создать расчет конструкции</button>
-        <button type="button" class="btn btn-default" id="btnUploadFile">Закачать</button>
+        <button type="button" class="btn btn-default" id="btnUploadFile" disabled="disabled">Закачать</button>
       </div>
 
       <div class="btn-group pull-right" role="group" aria-label="...">
-        <button type="button" class="btn btn-default" id="copybtn">Копировать</button>
-        <button type="button" class="btn btn-default" id="cutbtn">Вырезать</button>
-        <button type="button" class="btn btn-default" id="pastebtn">Вставить</button>
+        <button type="button" class="btn btn-default" id="copybtn" disabled="disabled">Копировать</button>
+        <button type="button" class="btn btn-default" id="cutbtn" disabled="disabled">Вырезать</button>
+        <button type="button" class="btn btn-default" id="pastebtn" disabled="disabled">Вставить</button>
 <!--        <button type="button" class="btn btn-default" id="deletebtn">Удалить выделенное</button>-->
       </div>     
     </div>
@@ -175,6 +175,12 @@ if (isset($_FILES["userfile"]))
       ?>
       </ol>
     </div>
+    <div class="message">
+      <div class="alert alert-danger alert-dismissible fade in hidden" id="alertMessage" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+        <p id="alertMessageText"></p>
+      </div>      
+    <div>
     <div class="FileManagerTable">
       <table class="table table-hover table-bordered">
         <thead>
@@ -240,6 +246,7 @@ if (isset($_FILES["userfile"]))
                           data-placement="top" 
                           title="Удалить" 
                           data-action="delete"
+                          data-folderid="'.$item["fileid"].'"
                       >
                   ';
                 echo '      <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>';
@@ -268,11 +275,16 @@ if (isset($_FILES["userfile"]))
                         <span class="glyphicon '.$icon.'" aria-hidden="true">
                         <a href="?path='.$path.'/'.$item['fileid'].'">'.$item['filename'].'</a>
 
-                        <div class="alert alert-danger alert-dismissible fade in hidden" role="alert">
+                        <div class="alert alert-danger alert-dismissible fade in hidden alertDelete'.$item["fileid"].'" role="alert">
                           <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
                           <p>Удалить файл/папку?</p>
                           <p>
-                            <button type="button" class="btn btn-danger">Удалить</button>
+                            <button type="button" 
+                              class="btn btn-danger btnDeleteFile"
+                              data-folderid="'.$item["fileid"].'"
+                            >
+                            Удалить
+                            </button>
                           </p>
                         </div>
 
@@ -291,6 +303,45 @@ if (isset($_FILES["userfile"]))
       </table>
     </div>
   </div>
+
+
+  <script>
+    function showMessage( message ) {
+      if ( message != '' || message != null ) {
+        $( '#alertMessageText' ).val( message );
+        $( '#alertMessage' ).removeClass( 'hidden' );
+      }
+    }
+
+
+    // show delete dialog
+    $ ( '.btnDelete' ).on( 'click', function ( ) {
+      var id = $( this ).data( 'folderid' );
+
+      if ( id != null || id != '' || id != 0) {
+        var alert_key = '.alertDelete' + id;
+        $( alert_key ).removeClass( 'hidden' );
+      }
+    });
+
+    // delete file/folder
+    $ ( '.btnDeleteFile' ).on( 'click', function ( ) {
+      var id = $( this ).data( 'folderid' );
+
+      if ( id != null || id != '' || id != 0) {
+        $.ajax({ 
+            url: 'scripts/provider.php',
+            data: { action: "fileDelete", fileIds: id },
+            type: 'POST',
+            success: function( output ) {
+                        //showMessage( output );
+                        location.reload();
+                    }
+        });        
+      }
+    });
+  </script>
+
 
   <?php
     echo '<div class="modal fade" id="dlgEditFolder" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">';
@@ -418,8 +469,8 @@ if (isset($_FILES["userfile"]))
                 data: { action: ajaxactionname, location: loc_id, fileid: id, filename: name, comment: cmt, host: window.location.hostname },
                 type: 'POST',
                 success: function( output ) {
-                            //alert ( output );
                             location.reload();
+                            //showMessage( 'Все сохранено.' );
                         }
             });
       }
@@ -429,7 +480,7 @@ if (isset($_FILES["userfile"]))
 
 
 
-
+<!--
 <div class="popup-box" id="popup-box-2">
     <div class="close">X</div>
     <div class="top">
@@ -455,7 +506,7 @@ if (isset($_FILES["userfile"]))
         <p><input type="submit" id="createfilebtn" value="Create" /></p>
     </div>
 </div>
-
+-->
 
 </body>
 </html>
