@@ -600,7 +600,9 @@ from detail d join detailtype dt on d.detailtypeid = dt.detailtypeid join measur
 		$recordset = $dbref->query
 		(
 			'
-				select f2.*, ftp2.ancestorid as `_parent`, ftp1.ancestorid
+				select f2.*, ftp2.ancestorid as `_parent`, ftp1.ancestorid,
+					group_concat(distinct breadcrumb.ancestorid order by breadcrumb.level desc) as breadcrumbs,
+					group_concat(distinct fcrumb.detailname order by breadcrumb.level desc separator "/") as breadcrumbsname                
 				from detail as f1
 					join detailtreepath as ftp1 on (ftp1.ancestorid = f1.detailid)
 					join detail as f2 on (ftp1.descendantid = f2.detailid)
@@ -609,7 +611,7 @@ from detail d join detailtype dt on d.detailtypeid = dt.detailtypeid join measur
 				        inner join detail as fcrumb on breadcrumb.ancestorid = fcrumb.detailid
 				where f2.fileid = '.$fileid.'
 				group by ftp1.descendantid
-				order by f2.sortorder asc, f2.detailname asc
+				order by breadcrumbsname  				
 			'
 		);
 	}
