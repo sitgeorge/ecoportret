@@ -134,9 +134,9 @@ if (isset($_FILES["userfile"]))
       </div>
 
       <div class="btn-group pull-right" role="group" aria-label="...">
-        <button type="button" class="btn btn-default" id="copybtn" disabled="disabled">Копировать</button>
-        <button type="button" class="btn btn-default" id="cutbtn" disabled="disabled">Вырезать</button>
-        <button type="button" class="btn btn-default" id="pastebtn" disabled="disabled">Вставить</button>
+        <button type="button" class="btn btn-default" id="copybtn">Копировать</button>
+        <button type="button" class="btn btn-default" id="cutbtn">Вырезать</button>
+        <button type="button" class="btn btn-default" id="pastebtn">Вставить</button>
 <!--        <button type="button" class="btn btn-default" id="deletebtn">Удалить выделенное</button>-->
       </div>     
     </div>

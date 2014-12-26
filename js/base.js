@@ -91,8 +91,11 @@ function pasteFile(locationId)
      	data: { action: actionValue, fileIds: sessionStorage.cutcopyfile, destination: locationId, host: window.location.hostname},
         type: 'POST',
         success: function(output) {
-                     location.reload();
-            	}
+            location.reload();
+        },
+        error: function( output ) {
+            location.reload();
+        }
 	});
 }
 

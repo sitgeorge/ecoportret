@@ -23,7 +23,7 @@ if(isset($_POST['action']) && !empty($_POST['action'])) {
         	echo "</pre>";
         	break;
         case 'fileCopy' : 
-            $destination = $_POST['destination'];;
+            $destination = $_POST['destination'];
             if ($destination == ""){
                 $destination = null;
             }
