@@ -68,6 +68,25 @@ if(isset($_POST['action']) && !empty($_POST['action'])) {
             $host = $_POST['host'];
             file_insert($parentid, $filename, $filetypeid, $isfolder, $isprotected, $comment, $host);
             break;
+
+        /* D E T A I L S */
+        
+        case 'detailMove':
+            $detailid = $_POST['detailid'];
+            $destination = $_POST['destination'];
+            $host = $_POST['host'];
+            detail_move($detailid, $destination, $host);
+            break;
+        case 'detailCopy':
+            $detailid = $_POST['detailid'];
+            $destination = $_POST['destination'];
+            $host = $_POST['host'];
+            detail_copy($detailid, $destination, $host);
+            break;
+        case 'detailDelete':
+            $detailid = $_POST['detailid'];
+            detail_delete($detailid);
+            break;
         /*  D I C T I O N A R I E S */
 
         /* Measurement Unit */
