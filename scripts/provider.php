@@ -87,6 +87,19 @@ if(isset($_POST['action']) && !empty($_POST['action'])) {
             $detailid = $_POST['detailid'];
             detail_delete($detailid);
             break;
+        case 'detailEdit' : 
+            $detailid = $_POST['detailid'];
+            $detailname = $_POST['detailname'];
+            $detaildescription = $_POST['description'];
+            $detailgost = $_POST['gost'];
+            $amount = $_POST['amount'];
+            $measurementunitid = $_POST['muid'];
+            $amountmaterial = $_POST['amountmaterial'];
+            $comment = $_POST['comment'];
+            $host = $_POST['host'];
+            detail_update($detailid, $detailname, $detaildescription, $detailgost, $amount, $measurementunitid, $amountmaterial, $comment, $host);
+            break;
+
         /*  D I C T I O N A R I E S */
 
         /* Measurement Unit */
