@@ -25,11 +25,17 @@
     }
     .content {
       margin: 50px 135px;
-      width: 940px;
+      width: 1200px;
     }
     .toolbar {
       display: block;
       margin: 20px 0;
+    }
+    #detailtable {
+      width:1200px;
+    }
+    .detailActionButtons {
+      width: 150px;
     }
   </style>
 </head>
@@ -41,12 +47,19 @@
     <script src="js/jquery.treegrid.js"></script>
   	<script src="js/details_base.js"></script>
     <div class="content">
+      <div class="navigation">
+      <ul class="nav nav-tabs">
+        <li class="col-sm-3"><a href="#">На главную</a></li>
+      </ul>
+      </div> 
     <div class="toolbar">
-      <div class="btn-group" role="group" aria-label="...">
+       <div class="btn-group" role="group" aria-label="...">
+        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#dlgEditFolder" id="btnAddGroup" data-action="new">Создать группу</button>
+      </div>
+      <div class="btn-group pull-right" role="group" aria-label="...">
         <button type="button" class="btn btn-default" id="copybtn">Копировать</button>
         <button type="button" class="btn btn-default" id="cutbtn">Вырезать</button>
         <button type="button" class="btn btn-default" id="pastebtn" disabled="disabled">Вставить</button>
-        <button type="button" class="btn btn-default" id="deletebtn">Удалить</button>
       </div>
     </div>
   	<?php 
@@ -55,7 +68,6 @@
         $result = detail_view($_GET["file"], Null);
         echo '<table id="detailtable" class="tree table table-bordered"><thead><tr>
           <th>Detail</th>
-          <th>Action</th>
           <th>DType Id</th>
           <th>Description</th>
           <th>Gost</th>
@@ -64,6 +76,7 @@
           <th>Material am.</th>
           <th>Total</th>
           <th>Comment</th>
+          <th></th>
           </tr></thead>';
 
         foreach ($result as $item) {
@@ -73,8 +86,35 @@
             $parent1 = " treegrid-parent-".$item["_parent"];
           }
           echo '<tr class="treegrid-'.$item["detailid"].$parent1.'" id="'.$item["detailid"].'">
-            <td>'.$item["detailname"].'</td>
-            <td style="width:100px;">';
+            <td>'.$item["detailname"].'</td>         
+            <td>'.$item["detailtypeid"].'</td>
+            <td>'.$item["detaildescription"].'</td>
+            <td>'.$item["detailgost"].'</td>
+            <td>'.$item["amount"].'</td>
+            <td>'.$item["measurementunitid"].'</td>
+            <td>'.$item["amountmaterial"].'</td>
+            <td>'.$item["amountmaterialtotal"].'</td>
+            <td>'.$item["comment"].'</td>
+            <td class="col-md-2 detailActionButtons">';
+
+          /* Action button */
+          echo '<div class="btn-group pull-left">
+                  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                    <span class="caret"></span>
+                  </button>
+                  <ul class="dropdown-menu" role="menu">
+                    <li><a href="#">Создать подгруппу</a></li>
+                    <li><a href="#">Создать элемент</a></li>
+                <!--                    
+                    <li><a href="#">Something else here</a></li>
+                    <li class="divider"></li>
+                    <li><a href="#">Separated link</a></li>
+                -->
+                  </ul>
+                </div>
+          ';
+          /* Delete button */
           echo '    <button type="button" 
                           class="btn btn-default pull-right btnDelete" 
                           aria-label="Delete row" 
@@ -85,7 +125,10 @@
                           data-target="#dlgDeleteDetail"
                           data-detailid="'.$item["detailid"].'"
                           data-detailname="'.$item["detailname"].'"
-                    ><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button>';
+                    >
+                    <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                    </button>';
+          /* Edit Button */
           echo '    <button type="button" 
                             class="btn btn-default pull-right" 
                             aria-label="Edit row" 
@@ -103,16 +146,12 @@
                             data-measurementunitid="'.$item["measurementunitid"].'"
                             data-amountmaterial="'.$item["amountmaterial"].'"
                             data-amountmaterial="'.$item["amountmaterialtotal"].'"
-                        ><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></button>';
-          echo '</td>          
-            <td>'.$item["detailtypeid"].'</td>
-            <td>'.$item["detaildescription"].'</td>
-            <td>'.$item["detailgost"].'</td>
-            <td>'.$item["amount"].'</td>
-            <td>'.$item["measurementunitid"].'</td>
-            <td>'.$item["amountmaterial"].'</td>
-            <td>'.$item["amountmaterialtotal"].'</td>
-            <td>'.$item["comment"].'</td></tr>';
+                        >
+                        <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+                        </button>';
+
+          echo '  </td>
+                </tr>';
         }
         echo '</table>';
         //echo print_r($result);
@@ -201,13 +240,6 @@
                 <input type="text" class="form-control" id="txtDetailAmountmaterial">
               </div>
             </div>
-            <div class="form-group" id="pnlWithError">
-              <label for="txtDetailTotalamount" class="col-sm-3 control-label">Кол-во всего</label>
-              <div class="col-sm-8">
-                <input type="text" class="form-control" id="txtDetailTotalamount">
-              </div>
-              <input type="hidden" class="form-control" id="txtDetailId">
-            </div>
           </form>
         </div>
         <div class="modal-footer">
@@ -249,7 +281,6 @@
       var amount= button.data('amount');
       var measurementunitid= button.data('measurementunitid');
       var amountmaterial= button.data('amountmaterial');
-      var amounttotal= button.data('amountmaterialtotal');
 
       var modal = $(this);
       modal.find( '#txtDetailName' ).val( name );
@@ -260,7 +291,6 @@
       modal.find( '#txtDetailAmount' ).val( amount );
       modal.find( '#txtDetailMeasure' ).val( measurementunitid );
       modal.find( '#txtDetailAmountmaterial').val(amountmaterial);
-      modal.find( '#txtDetailTotalamount' ).val( amounttotal );
 
       $( '#pnlWithError' ).removeClass( 'has-error' );
       $( '#pnlAlert' ).addClass( 'hidden' );
@@ -279,15 +309,13 @@
       var amount = $('#txtDetailAmount').val();
       var measurementunitid = $('#txtDetailMeasure').val();
       var amountmaterial = $('#txtDetailAmountmaterial').val();
-      var amounttotal = $('#txtDetailTotalamount').val();
-      if (( name == '') || (detailgost == '')|| (amount == '')|| (measurementunitid == '')|| (amountmaterial == '')|| (amounttotal == ''))
+      if (( name == '') || (detailgost == '')|| (amount == '')|| (measurementunitid == '')|| (amountmaterial == ''))
       {
         $( '#pnlWithError' ).addClass( 'has-error' );
         $( '#pnlAlert' ).removeClass( 'hidden' );
       }
       else
       {
-        alert(detailgost);
         $( '#pnlWithError' ).removeClass( 'has-error' );
         $( '#pnlAlert' ).addClass( 'hidden' );
         res = true;
@@ -306,7 +334,6 @@
         var amount = $('#txtDetailAmount').val();
         var measurementunitid = $('#txtDetailMeasure').val();
         var amountmaterial = $('#txtDetailAmountmaterial').val();
-        var amounttotal = $('#txtDetailTotalamount').val();
 
         editDetail(id, name, description, detailgost, amount, measurementunitid, amountmaterial, comment);
         $( '#btnCloseEditDetail' ).click();

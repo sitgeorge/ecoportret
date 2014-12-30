@@ -113,7 +113,8 @@ function editDetail(id, name, description, gost, amount, muid, amountmaterial, c
                 host: window.location.hostname },
         type: 'POST',
         success: function(output) {
-                     location.reload();
+                    alert(output);
+                     //location.reload();
                 }
     });
 }

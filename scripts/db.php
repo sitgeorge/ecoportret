@@ -482,8 +482,8 @@ function detail_update
 	opensql();
 
 	$statement = $dbref->prepare ( 'CALL detail_update (?, ?, ?, ?, ?, ?, ?, ?, ?' );
-	
-	$statement->bind_param( 'isssiidss', $detailid, $detailname, $detaildescription, $detailgost, $amount, $measurementunitid, $amountmaterial, $comment, $createdby );
+
+	$statement->bind_param( 'isssiidss', $detailid, $detailname, $detaildescription, $detailgost, $amount, $measurementunitid, $amountmaterial, $comment, $updatedby );
 
 	$statement->execute();
 	$statement->bind_result( $result );
