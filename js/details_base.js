@@ -97,6 +97,28 @@ function deleteDetail(id)
     });
 }
 
+function editDetail(id, name, description, gost, amount, muid, amountmaterial, comment)
+{
+    $.ajax({ 
+        url: 'scripts/provider.php',
+        data: { action: "detailEdit", 
+                detailid: id, 
+                detailname: name, 
+                description: description,
+                gost: gost,
+                amount: amount,
+                muid: muid,
+                amountmaterial: amountmaterial,
+                comment: comment, 
+                host: window.location.hostname },
+        type: 'POST',
+        success: function(output) {
+                    alert(output);
+                     //location.reload();
+                }
+    });
+}
+
 /*function createFolder(locationId, name, comment, isFolder)
 {
     if (isFolder == 1) {
