@@ -54,7 +54,7 @@
       </div> 
     <div class="toolbar">
        <div class="btn-group" role="group" aria-label="...">
-        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#dlgEditFolder" id="btnAddGroup" data-action="new">Создать группу</button>
+        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#dlgAddDetail" id="btnAddGroup" data-action="new" data-detailid="">Добавить корневой элемент</button>
       </div>
       <div class="btn-group pull-right" role="group" aria-label="...">
         <button type="button" class="btn btn-default" id="copybtn">Копировать</button>
@@ -101,14 +101,19 @@
 
           /* Action button */
           echo '<div class="btn-group pull-left">
-                  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                  <button type="button" 
+                          class="btn btn-default"
+                          data-action="new" 
+                          data-toggle="modal" 
+                          data-target="#dlgAddDetail"
+                          data-placement="top" 
+                          aria-expanded="false"
+                          data-detailid="'.$item["detailid"].'">
                     <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-                    <span class="caret"></span>
                   </button>
-                  <ul class="dropdown-menu" role="menu">
+                 <!--  <ul class="dropdown-menu" role="menu">
                     <li><a href="#">Создать подэлемент</a></li>
-                    <li><a href="#">Создать элемент</a></li>
-                <!--                    
+                                   
                     <li><a href="#">Something else here</a></li>
                     <li class="divider"></li>
                     <li><a href="#">Separated link</a></li>
@@ -252,7 +257,86 @@
     </div>
   </div>
 
+  <div class="modal fade" id="dlgAddDetail" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">  
+      <div class="modal-content">    
+        <div class="modal-header">     
+         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>      
+         <h4 class="modal-title" id="myModalLabel">Добавление элемента:</h4>    
+       </div>    
+       <div class="modal-body">
+          <div class="alert alert-danger col-sm-14 hidden" role="alert" id="pnlAlert">
+            Заполните все обязательные поля!
+          </div>
+          <form class="form-horizontal" id="frmEditDetail">
+            <div class="form-group" id="pnlWithError">
+              <label for="txtDetailAddName" class="col-sm-3 control-label">Наименование</label>
+              <div class="col-sm-8">
+                <input type="text" class="form-control" id="txtDetailAddName">
+              </div>
+            </div>
+            <div class="form-group" id="pnlWithError">
+              <div class="dialog-checkbox-div">
+                <input type="checkbox" id="chkEnableCalculate">
+              </div>
+              <label for="chkEnableCalculate" class="dialog-checkbox-lbl">Учитывать при расчете</label>
+            </div>
+            <div class="form-group" id="pnlWithError">
+              <div class="dialog-checkbox-div">
+                <input type="checkbox" id="chkSaveRecord">
+              </div>
+              <label for="chkSaveRecord" class="dialog-checkbox-lbl">Сохранить при расчете</label>
+            </div>
+            <div class="form-group" id="pnlWithError">
+              <label for="txtDetailAddComment" class="col-sm-3 control-label">Комментарий</label>
+              <div class="col-sm-8">
+                <input type="text" class="form-control" id="txtDetailAddComment">
+              </div>
+            </div>
+            <div id="containerDetailAdd">
+              <div class="form-group" id="pnlWithError">
+                <label for="txtDetailAddMeasure" class="col-sm-3 control-label">Ед. измерения</label>
+                <div class="col-sm-8">
+                  <input type="text" class="form-control" id="txtDetailAddMeasure">
+                </div>
+              </div>
+              <div class="form-group" id="pnlWithError">
+                <label for="txtDetailAddType" class="col-sm-3 control-label">Тип</label>
+                <div class="col-sm-8">
+                  <input type="text" class="form-control" id="txtDetailAddType">
+                </div>
+              </div>
+              <div class="form-group" id="pnlWithError">
+                <label for="txtDetailAddPrice" class="col-sm-3 control-label">Цена</label>
+                <div class="col-sm-8">
+                  <input type="text" class="form-control" id="txtDetailAddPrice">
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-success" autocomplete="off" id="btnAddDetail">Сохранить</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal" id="btnCloseAddDetail">Закрыть</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
+    $( '#dlgAddDetail' ).on( 'show.bs.modal', function ( event ) 
+    {
+      var button = $(event.relatedTarget);
+      var parentId = button.data('detailid');
+      $('#containerDetailAdd').hide();
+    })
+
+    $('#chkSaveRecord').change(function(){
+      $( "#containerDetailAdd" ).toggle( "fast", function() {
+        // Animation complete.
+      });
+    })
+
     $( '#dlgDeleteDetail' ).on( 'show.bs.modal', function ( event ) 
     {
       var button = $(event.relatedTarget);

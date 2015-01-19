@@ -214,3 +214,24 @@ table.treetable span.indenter a {
   text-decoration: none;
   width: 19px;
 }
+
+.dialog-checkbox-div {
+    margin-bottom: 0;
+    text-align: right;
+    width: 25%;
+    position: relative;
+    min-height: 1px;
+    padding-right: 15px;
+    padding-left: 15px;
+    float: left;
+}
+
+.dialog-checkbox-lbl {
+    margin-bottom: 0 !important;
+    width: 66.66666667%;
+    float: left;
+    position: relative;
+    min-height: 1px;
+    padding-right: 15px;
+    padding-left: 15px;
+}

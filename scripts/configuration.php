@@ -3,6 +3,6 @@
 $sqlservername = 'localhost';
 $sqldbname = 'ecoportret';
 $sqldbuser = 'root';
-$sqldbpassword = 'Abcd4680';
+$sqldbpassword = 'root';
 
 // TODO Add other settings
