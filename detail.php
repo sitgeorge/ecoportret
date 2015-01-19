@@ -24,15 +24,15 @@
     body {
     }
     .content {
-      margin: 50px 135px;
-      width: 1200px;
+      margin: 10px 135px;
+      width: 1400px;
     }
     .toolbar {
       display: block;
       margin: 20px 0;
     }
     #detailtable {
-      width:1200px;
+      width: 1400px;
     }
     .detailActionButtons {
       width: 150px;
@@ -67,15 +67,16 @@
       {
         $result = detail_view($_GET["file"], Null);
         echo '<table id="detailtable" class="tree table table-bordered"><thead><tr>
-          <th>Detail</th>
-          <th>DType Id</th>
-          <th>Description</th>
-          <th>Gost</th>
-          <th>Amount</th>
-          <th>Measure Id</th>
-          <th>Material am.</th>
-          <th>Total</th>
-          <th>Comment</th>
+          <th>Наименование</th>
+          <th>Тип</th>
+          <th>Маркировка</th>
+          <th>ГОСТ</th>
+          <th>Цена/ед.</th>
+          <th>Расх.норма</th>
+          <th>Расх.кол-во</th>
+          <th>Расх.всего</th>
+          <th>Счит.?</th>
+          <th>Комментарий</th>
           <th></th>
           </tr></thead>';
 
@@ -87,13 +88,14 @@
           }
           echo '<tr class="treegrid-'.$item["detailid"].$parent1.'" id="'.$item["detailid"].'">
             <td>'.$item["detailname"].'</td>         
-            <td>'.$item["detailtypeid"].'</td>
+            <td>'.$item["costtypeshortname"].'</td>
             <td>'.$item["detaildescription"].'</td>
             <td>'.$item["detailgost"].'</td>
+            <td>'.$item["pricevalue"].'</td>
             <td>'.$item["amount"].'</td>
-            <td>'.$item["measurementunitid"].'</td>
             <td>'.$item["amountmaterial"].'</td>
             <td>'.$item["amountmaterialtotal"].'</td>
+            <td>'.$item["docalc"].'</td>
             <td>'.$item["comment"].'</td>
             <td class="col-md-2 detailActionButtons">';
 
@@ -104,7 +106,7 @@
                     <span class="caret"></span>
                   </button>
                   <ul class="dropdown-menu" role="menu">
-                    <li><a href="#">Создать подгруппу</a></li>
+                    <li><a href="#">Создать подэлемент</a></li>
                     <li><a href="#">Создать элемент</a></li>
                 <!--                    
                     <li><a href="#">Something else here</a></li>

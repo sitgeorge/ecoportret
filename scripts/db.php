@@ -600,18 +600,41 @@ from detail d join detailtype dt on d.detailtypeid = dt.detailtypeid join measur
 		$recordset = $dbref->query
 		(
 			'
-				select f2.*, ftp2.ancestorid as `_parent`, ftp1.ancestorid,
-					group_concat(distinct breadcrumb.ancestorid order by breadcrumb.level desc) as breadcrumbs,
-					group_concat(distinct fcrumb.detailname order by breadcrumb.level desc separator "/") as breadcrumbsname                
+				select 
+				f2.detailid, 
+				f2.fileid,
+				case when f2.detailtypeid is null then f2.detailname else detailtype.detailtypename end as detailname,
+				f2.detailtypeid,
+				f2.detaildescription,
+				f2.detailgost,
+				f2.amount,
+				f2.amountmaterial,
+				f2.docalc,
+				f2.comment,
+				f2.sortorder,
+				f2.created,
+				f2.createdby,
+				f2.updated,
+				f2.updatedby,
+				detailprice.detailpriceid,
+				detailprice.pricevalue,
+				detailtype.costtypeid,
+				costtype.costtypeshortname,
+				ftp2.ancestorid as `_parent`, ftp1.ancestorid,
+				group_concat(distinct breadcrumb.ancestorid order by breadcrumb.level desc) as breadcrumbs,
+				group_concat(distinct fcrumb.detailname order by breadcrumb.level desc separator "/") as breadcrumbsname                
 				from detail as f1
 					join detailtreepath as ftp1 on (ftp1.ancestorid = f1.detailid)
 					join detail as f2 on (ftp1.descendantid = f2.detailid)
 						left outer join detailtreepath AS ftp2 on (ftp2.descendantid = f2.detailid and ftp2.level = 1)
 						join detailtreepath as breadcrumb on (ftp1.descendantid = breadcrumb.descendantid)
-				        inner join detail as fcrumb on breadcrumb.ancestorid = fcrumb.detailid
+						inner join detail as fcrumb on breadcrumb.ancestorid = fcrumb.detailid
+					left join detailtype on detailtype.detailtypeid = f2.detailtypeid
+				    inner join costtype on costtype.costtypeid = detailtype.costtypeid
+				    left join detailprice on f1.detailpriceid = detailprice.detailpriceid
 				where f2.fileid = '.$fileid.'
 				group by ftp1.descendantid
-				order by breadcrumbsname  				
+				order by breadcrumbsname
 			'
 		);
 	}
@@ -981,4 +1004,63 @@ function detailtype_insert
 	$result = 1;
 	closesql();
 	return $result;	
+}
+
+function costtype_view
+(
+	$measurementunitid,
+	$avoidinactive
+)
+{
+	global $dbref;
+
+	opensql();
+
+	$recordset = null;
+	$result = null;
+/*
+	echo "fileid ".$fileid;
+	echo "ancestorid".$ancestorid;
+*/
+
+	$where_clause = "";
+	if ( !is_null( $avoidinactive ) )
+	{
+		$where_clause = " where inactive = 0 ";
+	}
+
+
+	if (is_null($measurementunitid))
+	{
+		$recordset = $dbref->query
+		(
+			'
+				select * from measurementunit '.$where_clause.' order by measurementunitid
+			'
+		);
+	}
+	else
+	{
+		$recordset = $dbref->query
+		(
+			'
+				select * from measurementunit where measurementunitid = '.$measurementunitid.' order by measurementunitid
+			'
+		);
+	}
+
+	if (!is_null($recordset))
+	{
+		/*echo $recordset->num_rows;*/
+		while ( $data = $recordset->fetch_assoc() )
+		{
+			$result[] = $data;
+		}
+
+		//$result = $recordset->fetch_result();
+
+		$recordset->close();
+	}
+	closesql();
+	return $result;		
 }
