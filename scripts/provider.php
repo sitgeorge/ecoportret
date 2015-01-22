@@ -87,6 +87,7 @@ if(isset($_POST['action']) && !empty($_POST['action'])) {
             $detailid = $_POST['detailid'];
             detail_delete($detailid);
             break;
+        /* TO DO detail_insert */
         case 'detailEdit' : 
             $detailid = $_POST['detailid'];
             $detailname = $_POST['detailname'];
@@ -97,7 +98,10 @@ if(isset($_POST['action']) && !empty($_POST['action'])) {
             $amountmaterial = $_POST['amountmaterial'];
             $comment = $_POST['comment'];
             $host = $_POST['host'];
-            detail_update($detailid, $detailname, $detaildescription, $detailgost, $amount, $measurementunitid, $amountmaterial, $comment, $host);
+            /* new parameters */
+            $docalc = $_POST['docalc'];
+            $detailpriceid = $_POST['detailpriceid'];
+            detail_update($detailid, $detailname, $detaildescription, $detailgost, $amount, $measurementunitid, $amountmaterial, $comment, $host, $docalc, $detailpriceid);
             break;
 
         /*  D I C T I O N A R I E S */
@@ -129,16 +133,41 @@ if(isset($_POST['action']) && !empty($_POST['action'])) {
         case 'detailTypeUpdate':
             $detailtypeid = $_POST['detailtypeid'];
             $measurementunitid = $_POST['measurementunitid'];
+            $costtypeid = $_POST['costtypeid'];
             $detailtypename = $_POST['detailtypename'];
             $comment = $_POST['comment'];
-            detailtype_update( $detailtypeid, $detailtypename, $comment, $measurementunitid );
+            detailtype_update( $detailtypeid, $detailtypename, $comment, $measurementunitid, $costtypeid );
             break;
         case 'detailTypeInsert':
             $measurementunitid = $_POST['measurementunitid'];
+            $costtypeid = $_POST['costtypeid'];
             $detailtypename = $_POST['detailtypename'];
             $comment = $_POST['comment'];
-            detailtype_insert( $detailtypename, $comment, $measurementunitid );
+            detailtype_insert( $detailtypename, $comment, $measurementunitid, $costtypeid );
             break;
+
+        /* Detail Price */
+
+        case 'detailPriceDelete':
+            $detailtypeid = $_POST['detailpriceid'];
+            detailprice_delete($detailpriceid);
+            break;
+        case 'detailPriceUpdate':
+            $detailpriceid = $_POST['detailpriceid'];
+            $shippernamename = $_POST['shippernamename'];
+            $detailpricecause = $_POST['detailpricecause'];
+            $pricevalue = $_POST['pricevalue'];
+            $valuedate = $_POST['valuedate'];
+            detailtype_update( $detailpriceid, $shippernamename, $detailpricecause, $pricevalue, $valuedate );
+            break;
+        case 'detailPriceInsert':
+            $detailtypeid = $_POST['detailtypeid'];
+            $shippernamename = $_POST['shippernamename'];
+            $detailpricecause = $_POST['detailpricecause'];
+            $pricevalue = $_POST['pricevalue'];
+            $valuedate = $_POST['valuedate'];
+            detailtype_insert( $detailtypeid, $shippernamename, $detailpricecause, $pricevalue, $valuedate );
+            break;                   
     }
 }
 ?>

@@ -408,16 +408,19 @@ function detail_insert
 	$measurementunitid,
 	$amountmaterial /*float*/,
 	$comment /*varchar(1000)*/,
-	$createdby /*varchar(50)*/ 		/* client host name */
+	$createdby /*varchar(50)*/ 		/* client host name */,
+	$docalc,
+	$detailpriceid
 ) 
 {
 	global $dbref;
 
 	opensql();
 
-	$statement = $dbref->prepare ( 'CALL detail_insert (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)' );
+	$statement = $dbref->prepare ( 'CALL detail_insert (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)' );
 	
-	$statement->bind_param( 'iisssiidss', $parentid, $fileid, $detailname, $detaildescription, $detailgost, $amount, $measurementunitid, $amountmaterial, $comment, $createdby );
+	$statement->bind_param( 'iisssiidssii', $parentid, $fileid, $detailname, $detaildescription, 
+					$detailgost, $amount, $measurementunitid, $amountmaterial, $comment, $createdby, $docalc, $detailpriceid );
 
 	$statement->execute();
 	$statement->bind_result( $result );
@@ -890,9 +893,15 @@ function detailtype_view
 			$recordset = $dbref->query
 			(
 				'
-					select dt.detailtypeid, dt.detailtypename, dt.inactive, dt.comment as detailtypecomment, mu.measurementunitid, mu.measurementunitname 
-					from detailtype dt join measurementunit mu on dt.measurementunitid = mu.measurementunitid			
-					order by detailtypeid
+					select 
+						dt.detailtypeid, dt.detailtypename, dt.inactive, dt.comment as detailtypecomment, mu.measurementunitid, mu.measurementunitname,
+					    dt.costtypeid, ct.costtypeshortname
+					from 
+						detailtype dt 
+					    join measurementunit mu on dt.measurementunitid = mu.measurementunitid
+					    join costtype ct on ct.costtypeid = dt.costtypeid
+					order by 
+						detailtypeid;
 				'
 			);
 		}
@@ -909,10 +918,16 @@ function detailtype_view
 		$recordset = $dbref->query
 		(
 			'
-				select dt.detailtypeid, dt.detailtypename, dt.inactive, dt.comment as detailtypecomment, mu.measurementunitid, mu.measurementunitname 
-				from detailtype dt join measurementunit mu on dt.measurementunitid = mu.measurementunitid
+				select 
+					dt.detailtypeid, dt.detailtypename, dt.inactive, dt.comment as detailtypecomment, mu.measurementunitid, mu.measurementunitname,
+				    dt.costtypeid, ct.costtypeshortname
+				from 
+					detailtype dt 
+				    join measurementunit mu on dt.measurementunitid = mu.measurementunitid
+				    join costtype ct on ct.costtypeid = dt.costtypeid
 				where detailtypename like \'%'.$searchstring.'%\'
-				order by detailtypeid
+				order by 
+					detailtypeid;
 			'
 		);
 	}
@@ -957,7 +972,8 @@ function detailtype_update
 	$detailtypeid /* int(10) */,
 	$detailtypename /* varchar(50) */,
 	$comment,
-	$measurementunitid
+	$measurementunitid,
+	$costtypeid
 )
 {
 	global $dbref;
@@ -969,7 +985,8 @@ function detailtype_update
 			update detailtype 
 				set detailtypename=\''.$detailtypename.'\',
 					comment=\''.$comment.'\',
-					measurementunitid='.$measurementunitid.'
+					measurementunitid='.$measurementunitid.',
+					costtypeid = '.$costtypeid.'
 			where detailtypeid='.$detailtypeid
 
 		)) {
@@ -985,7 +1002,8 @@ function detailtype_insert
 (
 	$detailtypename /* varchar(50) */,
 	$comment,
-	$measurementunitid
+	$measurementunitid,
+	$costtypeid
 )
 {
 	global $dbref;
@@ -994,8 +1012,8 @@ function detailtype_insert
 
 	if (!$dbref->multi_query(
 			'
-				insert into detailtype(detailtypename, comment, measurementunitid) 
-				values(\''.$detailtypename.'\', \''.$comment.'\', '.$measurementunitid.')
+				insert into detailtype(detailtypename, comment, measurementunitid, costtypeid) 
+				values(\''.$detailtypename.'\', \''.$comment.'\', '.$measurementunitid.', '.$costtypeid.')
 			'
 		)) {
 	    echo "There was an error during detailtype_insert''s call: (" . $dbref->errno . ") " . $dbref->error;
@@ -1006,10 +1024,13 @@ function detailtype_insert
 	return $result;	
 }
 
+/*
+
+Выпадающий список "Тип" для формы редактирования detail
+
+*/
 function costtype_view
 (
-	$measurementunitid,
-	$avoidinactive
 )
 {
 	global $dbref;
@@ -1018,24 +1039,54 @@ function costtype_view
 
 	$recordset = null;
 	$result = null;
-/*
-	echo "fileid ".$fileid;
-	echo "ancestorid".$ancestorid;
-*/
 
-	$where_clause = "";
-	if ( !is_null( $avoidinactive ) )
+
+	$recordset = $dbref->query
+	(
+		'
+			select * from costtype order by costtypename
+		'
+	);
+
+	if (!is_null($recordset))
 	{
-		$where_clause = " where inactive = 0 ";
+		/*echo $recordset->num_rows;*/
+		while ( $data = $recordset->fetch_assoc() )
+		{
+			$result[] = $data;
+		}
+
+		//$result = $recordset->fetch_result();
+
+		$recordset->close();
 	}
+	closesql();
+	return $result;		
+}
 
+/*
 
-	if (is_null($measurementunitid))
+	Выпадающий список "Цена" для формы редактирования detail
+
+*/
+function detailprice_view
+(
+	$detailtypeid /* идентификатор из справочника */
+)
+{
+	global $dbref;
+
+	opensql();
+
+	$recordset = null;
+	$result = null;
+
+	if (is_null($detailtypeid))
 	{
 		$recordset = $dbref->query
 		(
 			'
-				select * from measurementunit '.$where_clause.' order by measurementunitid
+				select detailprice.*, detailtype.detailtypename from detailprice left join detailtype on detailprice.detailtypeid = detailtype.detailtypeid order by valuedate desc
 			'
 		);
 	}
@@ -1044,9 +1095,9 @@ function costtype_view
 		$recordset = $dbref->query
 		(
 			'
-				select * from measurementunit where measurementunitid = '.$measurementunitid.' order by measurementunitid
+				select * from detailprice where detailtypeid = '.$detailtypeid.' order by valuedate desc
 			'
-		);
+		);		
 	}
 
 	if (!is_null($recordset))
@@ -1063,4 +1114,144 @@ function costtype_view
 	}
 	closesql();
 	return $result;		
+}
+
+/*
+	Список строковых констант для поиска по наименованию при добавлении новой записи в detail
+	Данные собираются из справочника detailtype и таблицы detail (уникальные)
+	Выходной формат: 
+	value - строка
+	id - идентификатор записи в соответствующей таблице (detail или detailtype)
+	isfromdetail - если 1 - то строка и id относятся к таблице detail, если 0 - то к detailtype
+*/
+function detail_detailtype_uniquenames_view
+(
+	$detailtypeid
+)
+{
+	global $dbref;
+
+	opensql();
+
+	$recordset = null;
+	$result = null;
+
+
+	$recordset = $dbref->query
+	(
+		'
+			select
+				distinct detailname as value,
+				detailid as id,
+			    1 as isfromdetail
+			from
+				detail
+			where 
+				detailname is not null
+			union
+			select
+				distinct detailtypename as value,
+			    detailtypeid as id,
+			    0 as isfromdetail
+			from
+				detailtype			
+
+		'
+	);
+
+	if (!is_null($recordset))
+	{
+		/*echo $recordset->num_rows;*/
+		while ( $data = $recordset->fetch_assoc() )
+		{
+			$result[] = $data;
+		}
+
+		//$result = $recordset->fetch_result();
+
+		$recordset->close();
+	}
+	closesql();
+	return $result;		
+}
+
+
+/*************************/
+/* DETAIL PRICE functions*/
+/*************************/
+
+function detailprice_delete
+(
+	$detailpriceid /* int(10) */
+)
+{
+	global $dbref;
+
+	opensql();
+
+	if (!$dbref->multi_query('delete detailprice where detailpriceid='.$detailpriceid)) {
+	    echo "There was an error during detailprice_delete''s call: (" . $dbref->errno . ") " . $dbref->error;
+	}
+
+	$result = 1;
+	closesql();
+	return $result;	
+}
+
+function detailprice_update
+(
+	$detailpriceid,
+	$shippernamename,
+	$detailpricecause,
+	$pricevalue,
+	$valuedate
+)
+{
+	global $dbref;
+
+	opensql();
+
+	if (!$dbref->multi_query(
+		'
+			update detailprice 
+				set shippernamename=\''.$shippernamename.'\',
+					detailpricecause=\''.$detailpricecause.'\',
+					pricevalue='.$pricevalue.',
+					valuedate = '.$valuedate.'
+			where detailpriceid='.$detailpriceid
+
+		)) {
+	    echo "There was an error during detailprice_update''s call: (" . $dbref->errno . ") " . $dbref->error;
+	}
+
+	$result = 1;
+	closesql();
+	return $result;	
+}
+
+function detailprice_insert
+(
+	$detailtypeid /* int(10) */,
+	$shippernamename,
+	$detailpricecause,
+	$pricevalue,
+	$valuedate
+)
+{
+	global $dbref;
+
+	opensql();
+
+	if (!$dbref->multi_query(
+			'
+				insert into detailprice ( shippernamename, detailpricecause, pricevalue, valuedate, detailtypeid ) 
+				values(\''.$shippernamename.'\', \''.$detailpricecause.'\', '.$pricevalue.', '.$valuedate.', '.$detailtypeid.')
+			'
+		)) {
+	    echo "There was an error during detailprice_insert''s call: (" . $dbref->errno . ") " . $dbref->error;
+	}
+
+	$result = 1;
+	closesql();
+	return $result;	
 }

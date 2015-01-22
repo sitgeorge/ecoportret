@@ -24,6 +24,9 @@
     case 2:
       $dictionary_content = detailtype_view($search_string, null, null, null);
     break;
+    case 3:
+      $dictionary_content = detailprice_view( null );
+    break;
   }
 ?>
 
@@ -79,6 +82,9 @@
             echo "</pre>";
 */            
             detailtype_render_page($fileid, $dictionary_content);
+          break;
+          case 3:
+            detailprice_render_page($fileid, $dictionary_content);
           break;
         }
       ?>

@@ -66,6 +66,26 @@
       if (isset($_GET["file"]))
       {
         $result = detail_view($_GET["file"], Null);
+
+        /* T A B S */
+        echo '
+          <div role="tabpanel">
+
+            <!-- Nav tabs -->
+            <ul class="nav nav-tabs" role="tablist" id="tabNav">
+              <li role="presentation" class="active"><a href="#hierarchy" aria-controls="hierarchy" role="tab" data-toggle="tab">Комплект(иерарх.)</a></li>
+              <li role="presentation"><a href="#flatsort" aria-controls="flatsort" role="tab" data-toggle="tab">Комплект(сорт.)</a></li>
+              <!--
+                <li role="presentation"><a href="#messages" aria-controls="messages" role="tab" data-toggle="tab">Messages</a></li>
+                <li role="presentation"><a href="#settings" aria-controls="settings" role="tab" data-toggle="tab">Settings</a></li>
+              -->
+            </ul>
+
+            <!-- Tab panes -->
+            <div class="tab-content">
+              <div role="tabpanel" class="tab-pane active" id="hierarchy">
+        ';
+
         echo '<table id="detailtable" class="tree table table-bordered"><thead><tr>
           <th>Наименование</th>
           <th>Тип</th>
@@ -104,6 +124,7 @@
                   <button type="button" 
                           class="btn btn-default"
                           data-action="new" 
+                          title="Добавить подэлемент"
                           data-toggle="modal" 
                           data-target="#dlgAddDetail"
                           data-placement="top" 
@@ -163,6 +184,21 @@
         echo '</table>';
         //echo print_r($result);
 
+        echo '
+              </div>
+
+              <div role="tabpanel" class="tab-pane" id="flatsort">
+              TEST
+
+              </div>
+              <!--
+                <div role="tabpanel" class="tab-pane" id="messages">...</div>
+                <div role="tabpanel" class="tab-pane" id="settings">...</div>
+              -->
+            </div>
+
+          </div>
+        ';
       } 
     ?>
   </div>
@@ -425,6 +461,17 @@
         $( '#btnCloseEditDetail' ).click();
       }
     });
+
+    /* T A B S Activation */
+
+    $('#tabNav a[href="#hierarchy"]').click(function (e) {
+      e.preventDefault()
+      $(this).tab('hierarchy')
+    });
+    $('#tabNav a[href="#flatsort"]').click(function (e) {
+      e.preventDefault()
+      $(this).tab('flatsort')
+    })
   </script>
 
 </body>
